@@ -41,7 +41,7 @@ const MOCK_REVIEWS = [
 // ──────────────────────────────────────────
 async function fetchNotionDB(dbId, filter = null) {
   const url = `${CONFIG.NOTION_PROXY}/v1/databases/${dbId}/query`;
-  const body = { page_size: 100 };
+  const body = { page_size: 100, sorts: [{ property: "날짜", direction: "descending" }] };
   if (filter) body.filter = filter;
 
   const res = await fetch(url, {
@@ -58,14 +58,25 @@ async function fetchNotionDB(dbId, filter = null) {
   return data.results;
 }
 
+function normalizeDate(raw) {
+  if (!raw) return "";
+  // Already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw.slice(0, 10);
+  // Parse other formats (e.g. "Sep 26, 2017")
+  const d = new Date(raw);
+  if (isNaN(d)) return raw;
+  return d.toISOString().slice(0, 10);
+}
+
 function parseReview(page) {
   const props = page.properties;
+  const rawDate = props["날짜"]?.date?.start || "";
   return {
     id: page.id,
     title: props["공연명"]?.title?.[0]?.plain_text || "(제목 없음)",
-    date:  props["날짜"]?.date?.start || "",
-    venue: props["장소"]?.rich_text?.[0]?.plain_text || "",
-    rating: props["별점"]?.number || 0,
+    date:  normalizeDate(rawDate),
+    venue: props["공연장"]?.rich_text?.[0]?.plain_text || props["장소"]?.rich_text?.[0]?.plain_text || "",
+    rating: props["별점"]?.number ?? props["별점"]?.rollup?.number ?? props["별점"]?.rollup?.function === "average" ? props["별점"]?.rollup?.number ?? 0 : 0,
     review: props["후기"]?.rich_text?.[0]?.plain_text || "",
     driveImg: props["사진"]?.url || null,
   };
@@ -109,7 +120,7 @@ function calcStats(reviews) {
   const thisMonth = now.getMonth() + 1;
 
   const total = reviews.length;
-  const yearC = reviews.filter(r => r.date.startsWith(thisYear)).length;
+  const yearC = reviews.filter(r => r.date.startsWith(String(thisYear))).length;
   const monthC = reviews.filter(r => {
     const [y, m] = r.date.split("-");
     return parseInt(y) === thisYear && parseInt(m) === thisMonth;
