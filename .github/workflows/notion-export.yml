@@ -1,0 +1,34 @@
+name: Notion 데이터 업데이트
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 매일 새벽 9시 KST (UTC 0시)
+  workflow_dispatch:       # 수동 실행 버튼도 활성화
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 노션 데이터 export
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          REVIEW_DB_ID: 3743392a4e4a804fa8c8e1fbae1f0bec
+          SHOW_DB_ID: 3743392a4e4a80f6a1b7fa1f1efc7eaf
+        run: node scripts/export-notion.js
+
+      - name: data.json 커밋 & 푸시
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff --staged --quiet || git commit -m "chore: 노션 데이터 업데이트 $(date +'%Y-%m-%d')"
+          git push
