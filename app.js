@@ -82,13 +82,11 @@ function driveThumb(fileId, size = 200) {
 // ⭐ 별 렌더링
 // ──────────────────────────────────────────
 function renderStars(rating) {
-  // 10점 만점 → 5칸 별로 표시 (2점당 별 1개)
+  // 10점 만점 → 5칸 별로 표시 (반올림)
   if (!rating) return "☆☆☆☆☆";
-  const normalized = rating / 2; // 10점 → 5점 스케일
-  const full  = Math.floor(normalized);
-  const half  = (normalized - full) >= 0.5 ? 1 : 0;
-  const empty = Math.max(0, 5 - full - half);
-  return "★".repeat(full) + (half ? "½" : "") + "☆".repeat(empty);
+  const stars = Math.round(rating / 2);
+  const empty = Math.max(0, 5 - stars);
+  return "★".repeat(stars) + "☆".repeat(empty);
 }
 
 function starLabel(rating) {
