@@ -46,7 +46,10 @@ async function fetchNotionDB(dbId, filter = null) {
 
   const res = await fetch(url, {
     method: "POST",
-    "Notion-Version": "2022-06-28",
+    headers: {
+      "Content-Type": "application/json",
+      
+      "Notion-Version": "2022-06-28",
     },
     body: JSON.stringify(body),
   });
