@@ -30,35 +30,13 @@ const MOCK_REVIEWS = [
 ];
 
 // ──────────────────────────────────────────
-// 🌐 Notion API 호출
+// 📦 data.json 로드 (GitHub Actions가 매일 생성)
 // ──────────────────────────────────────────
-async function fetchNotionDB(dbId, filter = null) {
-  const baseUrl = `${CONFIG.NOTION_PROXY}/v1/databases/${dbId}/query`;
-  const allResults = [];
-  let cursor = undefined;
-
-  while (true) {
-    const body = { page_size: 100, sorts: [{ property: "날짜", direction: "descending" }] };
-    if (filter) body.filter = filter;
-    if (cursor) body.start_cursor = cursor;
-
-    const res = await fetch(baseUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-      },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error(`Notion API error: ${res.status}`);
-    const data = await res.json();
-    allResults.push(...data.results);
-
-    if (!data.has_more) break;
-    cursor = data.next_cursor;
-  }
-
-  return allResults;
+async function loadData() {
+  const res = await fetch(CONFIG.DATA_URL + "?t=" + Date.now());
+  if (!res.ok) throw new Error("data.json 로드 실패");
+  const json = await res.json();
+  return json.reviews || [];
 }
 
 function normalizeDate(raw) {
