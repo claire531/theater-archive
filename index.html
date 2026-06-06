@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관극 아카이브</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-title">
+      <span class="dot"></span>
+      관극 아카이브
+    </div>
+    <div class="nav-links">
+      <a href="#dashboard" class="nav-link active" data-tab="dashboard">대시보드</a>
+      <a href="#list" class="nav-link" data-tab="list">전체 목록</a>
+      <a href="#calendar" class="nav-link" data-tab="calendar">달력</a>
+      <a href="#stats" class="nav-link" data-tab="stats">통계</a>
+    </div>
+    <button class="nav-menu" id="menuBtn">☰</button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#dashboard" class="mobile-link" data-tab="dashboard">대시보드</a>
+    <a href="#list" class="mobile-link" data-tab="list">전체 목록</a>
+    <a href="#calendar" class="mobile-link" data-tab="calendar">달력</a>
+    <a href="#stats" class="mobile-link" data-tab="stats">통계</a>
+  </div>
+
+  <!-- STAT BAR -->
+  <div class="stat-bar">
+    <div class="stat-item">
+      <div class="stat-num" id="totalCount">—</div>
+      <div class="stat-label">총 관극 수</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num rose" id="yearCount">—</div>
+      <div class="stat-label">올해</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num rose" id="monthCount">—</div>
+      <div class="stat-label">이번달</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num gold" id="avgRating">—</div>
+      <div class="stat-label">평균 별점</div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- ===== DASHBOARD TAB ===== -->
+    <div id="tab-dashboard" class="tab-content active">
+
+      <!-- 최근 관극 -->
+      <section class="section">
+        <div class="sec-hd">
+          <span class="sec-title">최근 관극</span>
+          <span class="sec-more" data-goto="list">전체보기 →</span>
+        </div>
+        <div class="card-grid" id="recentCards">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </section>
+
+      <!-- 별점 TOP + 달력 -->
+      <div class="two-col">
+        <section class="section">
+          <div class="sec-hd">
+            <span class="sec-title">별점 TOP 공연</span>
+            <span class="sec-more" data-goto="list">더보기 →</span>
+          </div>
+          <div class="list-wrap" id="topRatedList">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="sec-hd">
+            <span class="sec-title">이번달 관극</span>
+          </div>
+          <div class="cal-wrap">
+            <div class="cal-head">
+              <button class="cal-nav" id="calPrev">‹</button>
+              <span class="cal-month" id="calMonth"></span>
+              <button class="cal-nav" id="calNext">›</button>
+            </div>
+            <div class="cal-dow-row">
+              <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- 공연장 태그 -->
+      <section class="section">
+        <div class="sec-hd"><span class="sec-title">자주 간 공연장</span></div>
+        <div class="badge-row" id="venueTags">
+          <span class="skeleton-tag"></span>
+          <span class="skeleton-tag"></span>
+          <span class="skeleton-tag"></span>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ===== LIST TAB ===== -->
+    <div id="tab-list" class="tab-content">
+      <section class="section">
+        <div class="sec-hd">
+          <span class="sec-title">전체 관극 목록</span>
+          <div class="filter-wrap">
+            <select class="filter-select" id="yearFilter">
+              <option value="">전체 연도</option>
+            </select>
+            <select class="filter-select" id="ratingFilter">
+              <option value="">전체 별점</option>
+              <option value="5">★★★★★</option>
+              <option value="4">★★★★</option>
+              <option value="3">★★★</option>
+            </select>
+          </div>
+        </div>
+        <div class="full-list" id="fullList"></div>
+      </section>
+    </div>
+
+    <!-- ===== CALENDAR TAB ===== -->
+    <div id="tab-calendar" class="tab-content">
+      <section class="section">
+        <div class="sec-hd">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <button class="cal-nav" id="bigCalPrev">‹</button>
+            <span class="sec-title" id="bigCalMonth"></span>
+            <button class="cal-nav" id="bigCalNext">›</button>
+          </div>
+        </div>
+        <div class="big-cal-wrap">
+          <div class="cal-dow-row big">
+            <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+          </div>
+          <div class="big-cal-grid" id="bigCalGrid"></div>
+        </div>
+      </section>
+      <div class="cal-detail" id="calDetail"></div>
+    </div>
+
+    <!-- ===== STATS TAB ===== -->
+    <div id="tab-stats" class="tab-content">
+      <section class="section">
+        <div class="sec-hd"><span class="sec-title">연도별 관극 수</span></div>
+        <div class="bar-chart" id="yearChart"></div>
+      </section>
+      <section class="section">
+        <div class="sec-hd"><span class="sec-title">월별 관극 수 (올해)</span></div>
+        <div class="bar-chart" id="monthChart"></div>
+      </section>
+      <section class="section">
+        <div class="sec-hd"><span class="sec-title">별점 분포</span></div>
+        <div class="bar-chart" id="ratingChart"></div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- DETAIL MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-img" id="modalImg"></div>
+      <div class="modal-body">
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-meta" id="modalMeta"></div>
+        <div class="modal-stars" id="modalStars"></div>
+        <div class="modal-review" id="modalReview"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
