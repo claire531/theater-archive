@@ -40,22 +40,32 @@ const MOCK_REVIEWS = [
 // 🌐 Notion API 호출
 // ──────────────────────────────────────────
 async function fetchNotionDB(dbId, filter = null) {
-  const url = `${CONFIG.NOTION_PROXY}/v1/databases/${dbId}/query`;
-  const body = { page_size: 100, sorts: [{ property: "날짜", direction: "descending" }] };
-  if (filter) body.filter = filter;
+  const baseUrl = `${CONFIG.NOTION_PROXY}/v1/databases/${dbId}/query`;
+  const allResults = [];
+  let cursor = undefined;
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      
-      "Notion-Version": "2022-06-28",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`Notion API error: ${res.status}`);
-  const data = await res.json();
-  return data.results;
+  while (true) {
+    const body = { page_size: 100, sorts: [{ property: "날짜", direction: "descending" }] };
+    if (filter) body.filter = filter;
+    if (cursor) body.start_cursor = cursor;
+
+    const res = await fetch(baseUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`Notion API error: ${res.status}`);
+    const data = await res.json();
+    allResults.push(...data.results);
+
+    if (!data.has_more) break;
+    cursor = data.next_cursor;
+  }
+
+  return allResults;
 }
 
 function normalizeDate(raw) {
@@ -76,7 +86,14 @@ function parseReview(page) {
     title: props["공연명"]?.title?.[0]?.plain_text || "(제목 없음)",
     date:  normalizeDate(rawDate),
     venue: props["공연장"]?.rich_text?.[0]?.plain_text || props["장소"]?.rich_text?.[0]?.plain_text || "",
-    rating: props["별점"]?.number ?? props["별점"]?.rollup?.number ?? props["별점"]?.rollup?.function === "average" ? props["별점"]?.rollup?.number ?? 0 : 0,
+    rating: (() => {
+      const p = props["별점"];
+      if (!p) return 0;
+      if (typeof p.number === "number") return p.number;
+      if (p.rollup?.number !== undefined) return p.rollup.number;
+      if (p.rollup?.array?.[0]?.number !== undefined) return p.rollup.array[0].number;
+      return 0;
+    })(),
     review: props["후기"]?.rich_text?.[0]?.plain_text || "",
     driveImg: props["사진"]?.url || null,
   };
