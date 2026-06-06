@@ -7,16 +7,9 @@
 // ⚙️  설정 (본인 값으로 교체하세요)
 // ──────────────────────────────────────────
 const CONFIG = {
-  REVIEW_DB_ID: "3743392a4e4a804fa8c8e1fbae1f0bec",
-  SHOW_DB_ID:   "3743392a4e4a80f6a1b7fa1f1efc7eaf",
+  DATA_URL: "./data.json",           // GitHub Actions가 매일 생성
   DRIVE_FOLDER: "1IEOuLpC76B0YbTymIO32qVKzFKGSYJFW",
-  NOTION_PROXY: "https://notion-proxy.happyberry08.workers.dev",
 };
-
-// Notion API는 브라우저에서 직접 호출 시 CORS 오류가 납니다.
-// Cloudflare Worker 프록시를 사용하거나, 아래 MOCK 데이터로 UI 확인 후 서버 연동하세요.
-// 프록시 없이 테스트하려면 USE_MOCK = true 로 변경하세요.
-const USE_MOCK = false;
 
 // ──────────────────────────────────────────
 // 🎭 MOCK 데이터 (실제 API 연동 전 UI 확인용)
@@ -531,15 +524,10 @@ async function init() {
 
   // 데이터 로드
   try {
-    if (USE_MOCK) {
-      allReviews = MOCK_REVIEWS;
-    } else {
-      const pages = await fetchNotionDB(CONFIG.REVIEW_DB_ID);
-      allReviews = pages.map(parseReview);
-    }
+    allReviews = await loadData();
   } catch (err) {
-    console.error("데이터 로드 실패:", err);
-    allReviews = MOCK_REVIEWS; // 실패 시 Mock으로 폴백
+    console.error("데이터 로드 실패 — Mock 데이터로 대체:", err);
+    allReviews = MOCK_REVIEWS;
   }
 
   // 렌더링
