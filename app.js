@@ -352,14 +352,19 @@ function initFilters() {
     sel.appendChild(opt);
   });
 
-  function applyFilter() {
-    const y = document.getElementById("yearFilter").value;
-    const r = document.getElementById("ratingFilter").value;
-    let filtered = [...allReviews];
-    if (y) filtered = filtered.filter(rv => rv.date.startsWith(y));
-    if (r) filtered = filtered.filter(rv => rv.rating >= parseFloat(r) && rv.rating < parseFloat(r)+1);
-    renderFullList(filtered);
-  }
+function applyFilter() {
+  const y = document.getElementById("yearFilter").value;
+  const r = document.getElementById("ratingFilter").value;
+  const keyword = document.getElementById("searchInput")?.value.trim().toLowerCase() || "";
+  let filtered = [...allReviews];
+  if (y) filtered = filtered.filter(rv => rv.date.startsWith(y));
+  if (r) filtered = filtered.filter(rv => rv.rating >= parseFloat(r) && rv.rating < parseFloat(r)+1);
+  if (keyword) filtered = filtered.filter(rv =>
+    rv.title.toLowerCase().includes(keyword) ||
+    rv.review.toLowerCase().includes(keyword)
+  );
+  renderFullList(filtered);
+}
   document.getElementById("yearFilter").onchange = applyFilter;
   document.getElementById("ratingFilter").onchange = applyFilter;
      document.getElementById("searchInput").addEventListener("input", function() {
