@@ -367,19 +367,7 @@ function applyFilter() {
 }
   document.getElementById("yearFilter").onchange = applyFilter;
   document.getElementById("ratingFilter").onchange = applyFilter;
-     document.getElementById("searchInput").addEventListener("input", function() {
-    const keyword = this.value.trim().toLowerCase();
-    const y = document.getElementById("yearFilter").value;
-    const r = document.getElementById("ratingFilter").value;
-    let filtered = [...allReviews];
-    if (y) filtered = filtered.filter(rv => rv.date.startsWith(y));
-    if (r) filtered = filtered.filter(rv => rv.rating >= parseFloat(r) && rv.rating < parseFloat(r)+1);
-    if (keyword) filtered = filtered.filter(rv =>
-      rv.title.toLowerCase().includes(keyword) ||
-      rv.review.toLowerCase().includes(keyword)
-    );
-    renderFullList(filtered);
-  });
+document.getElementById("searchInput").addEventListener("input", applyFilter);
 }
 
 // ──────────────────────────────────────────
