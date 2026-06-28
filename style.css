@@ -674,3 +674,24 @@ button { border: none; background: none; cursor: pointer; font-family: var(--fon
 @media (max-width: 400px) {
   .card-grid { grid-template-columns: 1fr; }
 }
+.search-wrap {
+  margin-bottom: 12px;
+}
+.search-input {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-family: var(--font);
+  background: var(--dark2);
+  color: var(--text-white);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus {
+  border-color: var(--rose);
+}
+.search-input::placeholder {
+  color: var(--text-dim);
+}
