@@ -371,7 +371,7 @@ button { border: none; background: none; cursor: pointer; font-family: var(--fon
 }
 .big-cal-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 .big-cal-day {
   min-height: 72px;
